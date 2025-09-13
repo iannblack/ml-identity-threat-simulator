@@ -1,0 +1,1 @@
+# IAM Risk Report\nTotal: {{ findings|length }}\n{% for f in findings %}- {{ f.binding.role }} — {{ f.binding.member }} ({{ f.score }})\n{% endfor %}\n

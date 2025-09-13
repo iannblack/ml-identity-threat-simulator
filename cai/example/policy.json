@@ -1,0 +1,5 @@
+{ "bindings": [
+  { "role": "roles/owner", "members": ["user:admin@example.com"] },
+  { "role": "roles/editor", "members": ["serviceAccount:sa-ci@demo.iam.gserviceaccount.com"] },
+  { "role": "roles/viewer", "members": ["allAuthenticatedUsers"] }
+] }

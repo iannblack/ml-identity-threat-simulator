@@ -1,0 +1,3 @@
+name: dataset-exfiltration
+checks: ['BQ dataset public access','GCS bucket wildcard']
+actions: ['Revoke wildcards','Rotate SA keys']

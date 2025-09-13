@@ -1,0 +1,3 @@
+name: privilege-escalation
+checks: ['SA has Owner/Editor','Over-broad WIF binding']
+actions: ['Downgrade role','Add IAM condition']
