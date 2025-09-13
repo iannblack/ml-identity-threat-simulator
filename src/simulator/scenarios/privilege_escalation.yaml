@@ -1,3 +1,7 @@
 name: privilege-escalation
-checks: ['SA has Owner/Editor','Over-broad WIF binding']
-actions: ['Downgrade role','Add IAM condition']
+checks:
+  - "Service account has Owner/Editor on project"
+  - "Workload Identity binding too broad"
+actions:
+  - "Downgrade to least-privilege role"
+  - "Add condition (resource/type) to binding"

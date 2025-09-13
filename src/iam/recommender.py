@@ -1,2 +1,9 @@
+# Placeholder for integrating IAM Recommender exports.
 def suggest_removals(findings):
-    return [{'action':'replace','member':f['binding']['member'],'from':f['binding']['role'],'to':'roles/viewer'} for f in findings if f['binding']['role'] in {'roles/owner','roles/editor'}]
+    suggestions = []
+    for f in findings:
+        role = f["binding"]["role"]
+        member = f["binding"]["member"]
+        if role in {"roles/owner","roles/editor"}:
+            suggestions.append({"action": "replace", "member": member, "from": role, "to": "roles/viewer"})
+    return suggestions

@@ -12,4 +12,6 @@ jobs:
       - name: Install deps
         run: pip install -r src/iam/requirements.txt pytest
       - name: Run tests
+        env:
+          PYTHONPATH: ${{ github.workspace }}
         run: pytest -q

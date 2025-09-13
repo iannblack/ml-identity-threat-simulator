@@ -1,3 +1,7 @@
 name: dataset-exfiltration
-checks: ['BQ dataset public access','GCS bucket wildcard']
-actions: ['Revoke wildcards','Rotate SA keys']
+checks:
+  - "BigQuery dataset has public/wildcard access"
+  - "GCS bucket allows allUsers/allAuthenticatedUsers"
+actions:
+  - "Revoke wildcard bindings"
+  - "Rotate service account keys (if any)"

@@ -1,1 +1,7 @@
-# IAM Risk Report\nTotal: {{ findings|length }}\n{% for f in findings %}- {{ f.binding.role }} — {{ f.binding.member }} ({{ f.score }})\n{% endfor %}\n
+# IAM Risk Report
+Total risky bindings: {{ findings|length }}
+
+{% for f in findings -%}
+- **Role:** {{ f.binding.role }} • **Member:** {{ f.binding.member }} • **Score:** {{ f.score }}
+  Reasons: {{ f.reason|join(", ") }}
+{% endfor %}
