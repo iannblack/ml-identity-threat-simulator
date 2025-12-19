@@ -1,6 +1,6 @@
-import yaml
-
 from typing import Any
+
+import yaml
 
 from src.core.models import ScenarioCheck, ScenarioResult
 

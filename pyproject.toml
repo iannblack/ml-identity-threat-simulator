@@ -58,6 +58,7 @@ dev = [
     "mkdocs>=1.5.0,<2.0.0",
     "mkdocs-material>=9.5.0,<10.0.0",
     "mkdocstrings[python]>=0.24.0,<1.0.0",
+    "types-PyYAML>=6.0.0,<7.0.0",
 ]
 
 [project.scripts]
@@ -140,6 +141,13 @@ ignore = [
     "S101",   # assert allowed in tests
     "ARG",    # unused arguments allowed in tests
     "PLR2004", # magic values allowed in tests
+    "RUF015", # prefer next over slice
+    "RUF005", # list concatenation
+]
+"tests/test_config.py" = [
+    "B017",   # assert blind exception
+    "PT011",  # pytest.raises too broad
+    "S101",
 ]
 
 [tool.ruff.lint.isort]

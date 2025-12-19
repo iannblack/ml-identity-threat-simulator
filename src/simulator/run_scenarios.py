@@ -3,11 +3,9 @@ from __future__ import annotations
 import argparse
 import json
 import os
+from typing import Any
 
 import yaml
-
-
-from typing import Any
 
 
 def run_scenario(path: str) -> dict[str, Any]:
