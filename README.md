@@ -525,7 +525,7 @@ copies or substantial portions of the Software.
 
 ## 🗺️ Roadmap
 
-- [ ] Support for AWS IAM policies
+- [x] Support for AWS IAM policies
 - [ ] Support for Azure RBAC
 - [ ] Interactive web dashboard
 - [ ] Integration with Security Command Center
