@@ -11,7 +11,7 @@ logger = logging.getLogger("iam-simulator")
 
 class AwsAuditor:
     def __init__(self, config: AppConfig | None = None) -> None:
-        self.config = config or AppConfig()
+        self.config = config or AppConfig(risky_roles=[], wildcard_members=[])
 
     def audit_policy(self, policy: AwsPolicy) -> list[Finding]:
         findings: list[Finding] = []
@@ -27,9 +27,14 @@ class AwsAuditor:
         return findings
 
     def _check_unrestricted_admin(self, stmt: AwsStatement) -> list[Finding]:
-        findings = []
-        actions = stmt.Action if isinstance(stmt.Action, list) else [stmt.Action]
-        resources = stmt.Resource if isinstance(stmt.Resource, list) else [stmt.Resource]
+        findings: list[Finding] = []
+
+        # Action and Resource are required fields per AWS spec but could be None in loose models
+        stmt_actions = stmt.Action or []
+        stmt_resources = stmt.Resource or []
+
+        actions = stmt_actions if isinstance(stmt_actions, list) else [stmt_actions]
+        resources = stmt_resources if isinstance(stmt_resources, list) else [stmt_resources]
 
         # Normalize actions and resources
         actions_set = set(actions)
@@ -37,7 +42,7 @@ class AwsAuditor:
 
         # Check for AdministratorAccess (Action: * and Resource: *)
         if "*" in actions_set and "*" in resources_set:
-             findings.append(
+            findings.append(
                 Finding(
                     id="AWS_UNRESTRICTED_ADMIN",
                     severity="CRITICAL",
@@ -51,18 +56,18 @@ class AwsAuditor:
         return findings
 
     def _check_public_access(self, stmt: AwsStatement) -> list[Finding]:
-        findings = []
+        findings: list[Finding] = []
         if not stmt.Principal:
             return findings
 
         # Check for Principal: "*" / {"AWS": "*"}
         is_public = False
         if stmt.Principal == "*":
-             is_public = True
+            is_public = True
         elif isinstance(stmt.Principal, dict):
-             if stmt.Principal.get("AWS") == "*":
-                 is_public = True
-        
+            if stmt.Principal.get("AWS") == "*":
+                is_public = True
+
         if is_public:
             findings.append(
                 Finding(
@@ -74,5 +79,5 @@ class AwsAuditor:
                     remediation="Specify explicit AWS accounts or users in Principal.",
                 )
             )
-        
+
         return findings

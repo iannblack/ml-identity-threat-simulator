@@ -9,7 +9,6 @@ class Binding(BaseModel):
     condition: dict | None = None
 
 
-
 class Policy(BaseModel):
     bindings: list[Binding]
     etag: str | None = None

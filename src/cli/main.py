@@ -38,7 +38,7 @@ def audit(policy: str, config: str, out: str, provider: str) -> None:
 
     try:
         app_config = AppConfig.load(config)
-        
+
         findings: list[Finding] = []
         if provider == "gcp":
             auditor = IAMAuditor(app_config)
