@@ -1,0 +1,14 @@
+risky_roles:
+  - roles/owner
+  - roles/editor
+  - roles/bigquery.admin
+  - roles/storage.admin
+  - roles/iam.securityAdmin
+
+wildcard_members:
+  - allUsers
+  - allAuthenticatedUsers
+
+logging:
+  level: INFO
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
