@@ -9,10 +9,26 @@ class Binding(BaseModel):
     condition: dict | None = None
 
 
+
 class Policy(BaseModel):
     bindings: list[Binding]
     etag: str | None = None
     version: int = 1
+
+
+class AwsStatement(BaseModel):
+    Sid: str | None = None
+    Effect: str  # Allow | Deny
+    Principal: dict[str, Any] | str | None = None  # AWS Principal
+    Action: list[str] | str  # Actions or "*"
+    Resource: list[str] | str | None = None  # Resource ARNs
+    Condition: dict[str, Any] | None = None
+
+
+class AwsPolicy(BaseModel):
+    Version: str = "2012-10-17"
+    Id: str | None = None
+    Statement: list[AwsStatement]
 
 
 class Finding(BaseModel):

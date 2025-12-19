@@ -6,7 +6,10 @@ from rich.table import Table
 
 from src.core.config import AppConfig
 from src.core.logger import setup_logger
+from src.core.models import Finding
 from src.iam.auditor import IAMAuditor
+from src.iam.aws_auditor import AwsAuditor
+from src.iam.aws_parsers import load_aws_policy_from_json
 from src.iam.parsers import load_policy_from_json
 from src.simulator.runner import ScenarioRunner
 
@@ -23,16 +26,28 @@ def cli() -> None:
 @click.option("--policy", required=True, help="Path to IAM policy JSON file")
 @click.option("--config", default="config.yaml", help="Path to configuration file")
 @click.option("--out", default="findings.json", help="Output file for findings")
-def audit(policy: str, config: str, out: str) -> None:
+@click.option(
+    "--provider",
+    default="gcp",
+    type=click.Choice(["gcp", "aws"]),
+    help="Cloud provider (gcp or aws)",
+)
+def audit(policy: str, config: str, out: str, provider: str) -> None:
     """Audit an IAM policy for risks."""
-    logger.info(f"Starting audit on {policy} using config {config}")
+    logger.info(f"Starting {provider.upper()} audit on {policy} using config {config}")
 
     try:
         app_config = AppConfig.load(config)
-        auditor = IAMAuditor(app_config)
-
-        policy_obj = load_policy_from_json(policy)
-        findings = auditor.audit_policy(policy_obj)
+        
+        findings: list[Finding] = []
+        if provider == "gcp":
+            auditor = IAMAuditor(app_config)
+            policy_obj = load_policy_from_json(policy)
+            findings = auditor.audit_policy(policy_obj)
+        elif provider == "aws":
+            aws_auditor = AwsAuditor(app_config)
+            aws_policy = load_aws_policy_from_json(policy)
+            findings = aws_auditor.audit_policy(aws_policy)
 
         # Display results
         table = Table(title=f"Audit Findings ({len(findings)})")

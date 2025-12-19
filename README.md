@@ -8,20 +8,20 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 
-**IAM Threat Simulator for ML pipelines on Google Cloud Platform.** Analyzes Cloud Asset Inventory (CAI) exports, detects risky IAM bindings, simulates attack scenarios, and generates actionable remediation playbooks.
+**IAM Threat Simulator for ML pipelines on Google Cloud Platform (GCP) and AWS.** Analyzes IAM exports, detects risky bindings/statements, simulates attack scenarios, and generates actionable remediation playbooks.
 
 ---
 
 ## 🚀 Features
 
-- **🔍 IAM Policy Auditing** - Detect overly permissive roles, wildcard access, and service account misconfigurations
-- **📊 Risk Scoring** - Quantify security risks with customizable severity levels (LOW, MEDIUM, HIGH, CRITICAL)
+- **🔍 Multi-Cloud Auditing** - Support for **GCP IAM** and **AWS IAM** policies
+- **📊 Risk Scoring** - Quantify security risks with customizable severity levels
 - **🎮 Threat Simulation** - Run attack scenarios to validate security controls
-- **🛠️ Remediation Playbooks** - Generate actionable `gcloud` commands to fix issues
+- **🛠️ Remediation Playbooks** - Generate actionable commands to fix issues
 - **💻 Rich CLI** - Beautiful terminal output with tables and progress indicators
 - **🔧 Extensible** - Easy to add custom rules and scenarios
-- **🧪 Well-Tested** - 80%+ code coverage with comprehensive test suite
-- **🔒 Security-First** - Automated security scanning with Bandit and Safety
+- **🧪 Well-Tested** - 100% code coverage with comprehensive test suite
+- **🔒 Security-First** - Automated security scanning
 
 ---
 
@@ -43,8 +43,8 @@
 ## 📦 Prerequisites
 
 - **Python 3.10 or higher**
-- **Google Cloud SDK** (for remediation commands)
-- **Access to GCP Cloud Asset Inventory exports** (optional, for production use)
+- **Google Cloud SDK** (for GCP remediation)
+- **AWS CLI** (for AWS remediation)
 
 ---
 
