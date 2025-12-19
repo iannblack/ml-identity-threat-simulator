@@ -1,10 +1,21 @@
 from __future__ import annotations
-import argparse, yaml, json, os
+
+import argparse
+import json
+import os
+
+import yaml
+
 
 def run_scenario(path):
-    with open(path, "r") as f:
+    with open(path) as f:
         sc = yaml.safe_load(f)
-    return {"name": sc.get("name"), "checks": sc.get("checks", []), "actions": sc.get("actions", [])}
+    return {
+        "name": sc.get("name"),
+        "checks": sc.get("checks", []),
+        "actions": sc.get("actions", []),
+    }
+
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()

@@ -1,9 +1,14 @@
 from __future__ import annotations
-import argparse, json, os
-from src.iam.parsers import load_json, extract_bindings_from_policy
+
+import argparse
+import json
+import os
+
+from src.iam.parsers import extract_bindings_from_policy, load_json
 
 RISKY_ROLES = {"roles/owner", "roles/editor", "roles/bigquery.admin", "roles/storage.admin"}
 WILDCARDS = {"allUsers", "allAuthenticatedUsers"}
+
 
 def score_binding(binding):
     score = 0
@@ -11,16 +16,26 @@ def score_binding(binding):
     role = binding["role"]
     member = binding["member"]
     if role in RISKY_ROLES:
-        score += 5; reason.append(f"risky-role:{role}")
-    if member in WILDCARDS or member.endswith(":allUsers") or member.endswith(":allAuthenticatedUsers"):
-        score += 5; reason.append("wildcard-member")
-    if member.startswith("serviceAccount:") and role in {"roles/owner","roles/editor"}:
-        score += 3; reason.append("sa-high-priv")
+        score += 5
+        reason.append(f"risky-role:{role}")
+    if (
+        member in WILDCARDS
+        or member.endswith(":allUsers")
+        or member.endswith(":allAuthenticatedUsers")
+    ):
+        score += 5
+        reason.append("wildcard-member")
+    if member.startswith("serviceAccount:") and role in {"roles/owner", "roles/editor"}:
+        score += 3
+        reason.append("sa-high-priv")
     return score, reason
+
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("--assets", required=True, help="CAI assets export (unused in this minimal demo)")
+    ap.add_argument(
+        "--assets", required=True, help="CAI assets export (unused in this minimal demo)"
+    )
     ap.add_argument("--policy", required=True, help="Project IAM policy JSON")
     ap.add_argument("--out", default="artifacts")
     args = ap.parse_args()

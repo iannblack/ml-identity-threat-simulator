@@ -1,5 +1,8 @@
 from __future__ import annotations
-import argparse, json
+
+import argparse
+import json
+
 from jinja2 import Template
 
 if __name__ == "__main__":
@@ -7,9 +10,9 @@ if __name__ == "__main__":
     ap.add_argument("--findings", required=True)
     ap.add_argument("--out", required=True)
     args = ap.parse_args()
-    with open(args.findings, "r") as f:
+    with open(args.findings) as f:
         data = json.load(f)
-    with open("reports/templates/report.md.j2", "r") as f:
+    with open("reports/templates/report.md.j2") as f:
         tmpl = Template(f.read())
     md = tmpl.render(findings=data.get("findings", []))
     with open(args.out, "w") as f:
