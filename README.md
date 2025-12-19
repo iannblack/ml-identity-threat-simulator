@@ -88,7 +88,15 @@ docker run --rm \
   audit --policy /app/data/policy.json --out /app/output/findings.json
 ```
 
-**See [DOCKER_COMMANDS.md](DOCKER_COMMANDS.md) for complete Docker guide.**
+### Build Locally
+
+```bash
+# Build the image
+docker build -t iam-simulator:latest .
+
+# Run container scan
+docker run --rm -v $(pwd)/src:/app/src iam-simulator:latest audit --help
+```
 
 ---
 
