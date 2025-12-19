@@ -74,6 +74,22 @@ iam-simulator --help
 pip install ml-identity-threat-simulator
 ```
 
+### Using Docker 🐳
+
+```bash
+# Pull the image
+docker pull imnotkilian/iam-simulator:latest
+
+# Run with Docker
+docker run --rm \
+  -v $(pwd)/data:/app/data:ro \
+  -v $(pwd)/output:/app/output:rw \
+  iam-simulator:latest \
+  audit --policy /app/data/policy.json --out /app/output/findings.json
+```
+
+**See [DOCKER_COMMANDS.md](DOCKER_COMMANDS.md) for complete Docker guide.**
+
 ---
 
 ## ⚡ Quick Start

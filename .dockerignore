@@ -1,0 +1,72 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info
+dist/
+build/
+.venv
+venv/
+ENV/
+env/
+
+# Testing
+.pytest_cache
+.coverage
+htmlcov/
+.tox/
+.mypy_cache/
+.ruff_cache/
+*.cover
+coverage.xml
+mypy-report/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Documentation
+*.md
+!README.md
+docs/
+PROFESSIONAL_REVIEW.md
+CI_CD_SUMMARY.md
+SETUP_COMMANDS.md
+QUICK_START.md
+IMPLEMENTATION_CHECKLIST.md
+PROJECT_STRUCTURE.md
+BADGES.md
+DOCS_INDEX.md
+EXECUTIVE_SUMMARY.md
+TEST_COMMANDS.md
+README_COMMANDS.md
+TYPE_HINTS_COMMANDS.md
+FINAL_SUMMARY.md
+
+# CI/CD
+.github/
+.pre-commit-config.yaml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.log
+*.tmp
+*.bak
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose.yml

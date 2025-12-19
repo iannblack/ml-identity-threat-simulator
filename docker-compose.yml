@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  iam-simulator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: iam-simulator:latest
+    container_name: iam-simulator
+    
+    # Environment variables
+    environment:
+      - IAM_SIMULATOR_LOGGING_LEVEL=INFO
+      - GCP_PROJECT_ID=${GCP_PROJECT_ID:-your-project-id}
+      - GCP_ORGANIZATION_ID=${GCP_ORGANIZATION_ID:-your-org-id}
+    
+    # Volumes for data persistence
+    volumes:
+      - ./data:/app/data:ro          # Input data (read-only)
+      - ./output:/app/output:rw      # Output files (read-write)
+      - ./config.yaml:/app/config.yaml:ro  # Configuration (read-only)
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    
+    # Restart policy
+    restart: unless-stopped
+    
+    # Security options
+    security_opt:
+      - no-new-privileges:true
+    
+    # Read-only root filesystem (except /tmp and /app/output)
+    read_only: true
+    tmpfs:
+      - /tmp
+    
+    # Command override (example: run audit)
+    # command: ["audit", "--policy", "/app/data/policy.json", "--config", "/app/config.yaml", "--out", "/app/output/findings.json"]
