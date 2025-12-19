@@ -7,7 +7,10 @@ import os
 import yaml
 
 
-def run_scenario(path):
+from typing import Any
+
+
+def run_scenario(path: str) -> dict[str, Any]:
     with open(path) as f:
         sc = yaml.safe_load(f)
     return {

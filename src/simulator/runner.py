@@ -1,10 +1,12 @@
 import yaml
 
+from typing import Any
+
 from src.core.models import ScenarioCheck, ScenarioResult
 
 
 class ScenarioRunner:
-    def load_scenario(self, path: str) -> dict:
+    def load_scenario(self, path: str) -> Any:
         with open(path) as f:
             return yaml.safe_load(f)
 

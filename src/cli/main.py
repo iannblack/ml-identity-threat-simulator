@@ -15,7 +15,7 @@ logger = setup_logger()
 
 
 @click.group()
-def cli():
+def cli() -> None:
     """ML Identity Threat Simulator CLI"""
 
 
@@ -23,7 +23,7 @@ def cli():
 @click.option("--policy", required=True, help="Path to IAM policy JSON file")
 @click.option("--config", default="config.yaml", help="Path to configuration file")
 @click.option("--out", default="findings.json", help="Output file for findings")
-def audit(policy, config, out):
+def audit(policy: str, config: str, out: str) -> None:
     """Audit an IAM policy for risks."""
     logger.info(f"Starting audit on {policy} using config {config}")
 
@@ -46,8 +46,8 @@ def audit(policy, config, out):
         console.print(table)
 
         # Export
-        with open(out, "w") as f:
-            json.dump([f.model_dump() for f in findings], f, indent=2)
+        with open(out, "w") as file_out:
+            json.dump([f.model_dump() for f in findings], file_out, indent=2)
 
         logger.info(f"Findings exported to {out}")
 
@@ -59,7 +59,7 @@ def audit(policy, config, out):
 @cli.command()
 @click.option("--scenario", required=True, help="Path to scenario YAML file")
 @click.option("--out", default="simulation_result.json", help="Output file")
-def simulate(scenario, out):
+def simulate(scenario: str, out: str) -> None:
     """Run a threat scenario simulation."""
     logger.info(f"Running scenario: {scenario}")
 

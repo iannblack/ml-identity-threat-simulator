@@ -351,7 +351,6 @@ class TestEdgeCases:
         finally:
             os.unlink(temp_path)
 
-
     def test_load_policy_very_large(self):
         """Test loading policy with many bindings."""
         bindings = []
