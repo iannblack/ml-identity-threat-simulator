@@ -3,20 +3,20 @@ IAM Recommender integration module.
 Provides suggestions for IAM policy improvements.
 """
 
-from typing import Any, Dict, List
+from typing import Any
 
 
-def suggest_removals(findings: List[Dict[str, Any]]) -> List[Dict[str, str]]:
+def suggest_removals(findings: list[dict[str, Any]]) -> list[dict[str, str]]:
     """
     Suggest IAM binding removals or replacements based on findings.
-    
+
     Args:
         findings: List of finding dictionaries with binding information
-        
+
     Returns:
         List of suggestion dictionaries with action, member, from, and to fields
     """
-    suggestions: List[Dict[str, str]] = []
+    suggestions: list[dict[str, str]] = []
     for f in findings:
         role: str = f["binding"]["role"]
         member: str = f["binding"]["member"]

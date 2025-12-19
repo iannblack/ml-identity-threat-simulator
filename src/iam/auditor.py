@@ -1,4 +1,3 @@
-
 from src.core.config import AppConfig
 from src.core.models import Finding, Policy
 
@@ -24,10 +23,8 @@ class IAMAuditor:
 
             # Check 2: Wildcard Access
             for member in binding.members:
-                if (
-                    member in self.config.wildcard_members
-                    or member.endswith("allUsers")
-                    or member.endswith("allAuthenticatedUsers")
+                if member in self.config.wildcard_members or member.endswith(
+                    ("allUsers", "allAuthenticatedUsers")
                 ):
                     findings.append(
                         Finding(

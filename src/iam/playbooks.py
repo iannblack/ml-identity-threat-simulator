@@ -7,12 +7,12 @@ Generates gcloud commands for IAM policy remediation.
 def revoke_binding_cmd(project_id: str, role: str, member: str) -> str:
     """
     Generate gcloud command to revoke an IAM binding.
-    
+
     Args:
         project_id: GCP project ID
         role: IAM role to revoke
         member: Member to revoke the role from
-        
+
     Returns:
         gcloud command string
     """
@@ -22,12 +22,12 @@ def revoke_binding_cmd(project_id: str, role: str, member: str) -> str:
 def add_binding_cmd(project_id: str, role: str, member: str) -> str:
     """
     Generate gcloud command to add an IAM binding.
-    
+
     Args:
         project_id: GCP project ID
         role: IAM role to add
         member: Member to grant the role to
-        
+
     Returns:
         gcloud command string
     """

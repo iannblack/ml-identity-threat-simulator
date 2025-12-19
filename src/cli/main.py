@@ -53,7 +53,7 @@ def audit(policy, config, out):
 
     except Exception:
         logger.exception("Audit failed")
-        raise click.Abort()
+        raise click.Abort from None
 
 
 @cli.command()
@@ -80,7 +80,7 @@ def simulate(scenario, out):
 
     except Exception:
         logger.exception("Simulation failed")
-        raise click.Abort()
+        raise click.Abort from None
 
 
 if __name__ == "__main__":
