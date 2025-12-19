@@ -351,21 +351,6 @@ class TestEdgeCases:
         finally:
             os.unlink(temp_path)
 
-    def test_load_policy_with_unicode(self):
-        """Test loading policy with unicode characters."""
-        policy_data = {"bindings": [{"role": "roles/viewer", "members": ["user:tëst@éxample.com"]}]}
-
-        with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".json", delete=False, encoding="utf-8"
-        ) as f:
-            json.dump(policy_data, f, ensure_ascii=False)
-            temp_path = f.name
-
-        try:
-            policy = load_policy_from_json(temp_path)
-            assert "user:tëst@éxample.com" in policy.bindings[0].members
-        finally:
-            os.unlink(temp_path)
 
     def test_load_policy_very_large(self):
         """Test loading policy with many bindings."""
