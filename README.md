@@ -109,7 +109,21 @@ docker run --rm -v $(pwd)/src:/app/src iam-simulator:latest audit --help
 gcloud projects get-iam-policy YOUR_PROJECT_ID --format=json > policy.json
 ```
 
-### 2. Run Audit
+### 2. Audit AWS Policy
+
+```bash
+# Use an existing AWS policy JSON file
+iam-simulator audit --policy aws_policy.json --provider aws
+```
+
+### 3. Audit Azure Role
+
+```bash
+# Use an existing Azure role definition JSON
+iam-simulator audit --policy azure_role.json --provider azure
+```
+
+### 4. Run Audit
 
 ```bash
 # Audit the policy for security risks
@@ -526,7 +540,7 @@ copies or substantial portions of the Software.
 ## 🗺️ Roadmap
 
 - [x] Support for AWS IAM policies
-- [ ] Support for Azure RBAC
+- [x] Support for Azure RBAC
 - [ ] Interactive web dashboard
 - [ ] Integration with Security Command Center
 - [ ] ML-based anomaly detection

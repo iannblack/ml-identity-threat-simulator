@@ -30,6 +30,18 @@ class AwsPolicy(BaseModel):
     Statement: list[AwsStatement]
 
 
+class AzureRoleDefinition(BaseModel):
+    Name: str | None = None  # The UUID or display name
+    RoleName: str | None = Field(None, alias="roleName")
+    Description: str | None = Field(None, alias="description")
+    Actions: list[str] = Field(default_factory=list, alias="actions")
+    NotActions: list[str] = Field(default_factory=list, alias="notActions")
+    DataActions: list[str] = Field(default_factory=list, alias="dataActions")
+    NotDataActions: list[str] = Field(default_factory=list, alias="notDataActions")
+    AssignableScopes: list[str] = Field(default_factory=list, alias="assignableScopes")
+    IsCustom: bool = Field(False, alias="isCustom")
+
+
 class Finding(BaseModel):
     id: str = Field(..., description="Unique identifier for the finding type")
     severity: str = Field(..., pattern="^(LOW|MEDIUM|HIGH|CRITICAL)$")

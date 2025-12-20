@@ -10,6 +10,8 @@ from src.core.models import Finding
 from src.iam.auditor import IAMAuditor
 from src.iam.aws_auditor import AwsAuditor
 from src.iam.aws_parsers import load_aws_policy_from_json
+from src.iam.azure_auditor import AzureAuditor
+from src.iam.azure_parsers import load_azure_role_from_json
 from src.iam.parsers import load_policy_from_json
 from src.simulator.runner import ScenarioRunner
 
@@ -29,8 +31,8 @@ def cli() -> None:
 @click.option(
     "--provider",
     default="gcp",
-    type=click.Choice(["gcp", "aws"]),
-    help="Cloud provider (gcp or aws)",
+    type=click.Choice(["gcp", "aws", "azure"]),
+    help="Cloud provider (gcp, aws, azure)",
 )
 def audit(policy: str, config: str, out: str, provider: str) -> None:
     """Audit an IAM policy for risks."""
@@ -48,6 +50,10 @@ def audit(policy: str, config: str, out: str, provider: str) -> None:
             aws_auditor = AwsAuditor(app_config)
             aws_policy = load_aws_policy_from_json(policy)
             findings = aws_auditor.audit_policy(aws_policy)
+        elif provider == "azure":
+            azure_auditor = AzureAuditor(app_config)
+            role_def = load_azure_role_from_json(policy)
+            findings = azure_auditor.audit_policy(role_def)
 
         # Display results
         table = Table(title=f"Audit Findings ({len(findings)})")
