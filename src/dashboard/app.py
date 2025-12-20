@@ -43,12 +43,12 @@ def run_audit(file_path: str, provider: str) -> list[Finding]:
     try:
         if provider == "GCP":
             auditor = IAMAuditor(app_config)
-            policy = load_policy_from_json(file_path)
-            findings = auditor.audit_policy(policy)
+            gcp_policy = load_policy_from_json(file_path)
+            findings = auditor.audit_policy(gcp_policy)
         elif provider == "AWS":
             aws_auditor = AwsAuditor(app_config)
-            policy = load_aws_policy_from_json(file_path)
-            findings = aws_auditor.audit_policy(policy)
+            aws_policy = load_aws_policy_from_json(file_path)
+            findings = aws_auditor.audit_policy(aws_policy)
         elif provider == "Azure":
             azure_auditor = AzureAuditor(app_config)
             role = load_azure_role_from_json(file_path)
