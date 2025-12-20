@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-from typing import Any
 
 from src.core.config import AppConfig
 from src.core.models import AwsPolicy, AwsStatement, Finding
@@ -61,14 +60,9 @@ class AwsAuditor:
             return findings
 
         # Check for Principal: "*" / {"AWS": "*"}
-        is_public = False
-        if stmt.Principal == "*":
-            is_public = True
-        elif isinstance(stmt.Principal, dict):
-            if stmt.Principal.get("AWS") == "*":
-                is_public = True
-
-        if is_public:
+        if stmt.Principal == "*" or (
+            isinstance(stmt.Principal, dict) and stmt.Principal.get("AWS") == "*"
+        ):
             findings.append(
                 Finding(
                     id="AWS_PUBLIC_ACCESS",

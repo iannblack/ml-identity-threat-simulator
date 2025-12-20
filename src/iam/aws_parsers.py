@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-from typing import Any
 
 from src.core.models import AwsPolicy, AwsStatement
 
