@@ -8,7 +8,7 @@ try:
     from google.protobuf import timestamp_pb2
 except ImportError:
     securitycenter = None  # type: ignore
-    timestamp_pb2 = None  # type: ignore
+    timestamp_pb2 = None
 
 from src.core.models import Finding
 
