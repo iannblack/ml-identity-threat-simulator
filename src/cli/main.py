@@ -1,4 +1,6 @@
 import json
+import os
+import sys
 
 import click
 from rich.console import Console
@@ -102,6 +104,27 @@ def simulate(scenario: str, out: str) -> None:
     except Exception:
         logger.exception("Simulation failed")
         raise click.Abort from None
+
+
+@cli.command()
+def dashboard() -> None:
+    """Launch the interactive web dashboard."""
+    from streamlit.web import cli as stcli
+
+    logger.info("Launching dashboard...")
+
+    # Resolve path to dashboard app
+    # src/cli/main.py -> ../dashboard/app.py
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    dashboard_path = os.path.join(current_dir, "..", "dashboard", "app.py")
+
+    if not os.path.exists(dashboard_path):
+        console.print(f"[bold red]Error:[/bold red] Dashboard app not found at {dashboard_path}")
+        return
+
+    # Invoke streamlit
+    sys.argv = ["streamlit", "run", dashboard_path]
+    sys.exit(stcli.main())
 
 
 if __name__ == "__main__":

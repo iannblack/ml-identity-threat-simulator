@@ -123,7 +123,14 @@ iam-simulator audit --policy aws_policy.json --provider aws
 iam-simulator audit --policy azure_role.json --provider azure
 ```
 
-### 4. Run Audit
+### 4. Interactive Dashboard
+
+```bash
+# Launch the web interface
+iam-simulator dashboard
+```
+
+### 5. Run Audit
 
 ```bash
 # Audit the policy for security risks
@@ -541,7 +548,7 @@ copies or substantial portions of the Software.
 
 - [x] Support for AWS IAM policies
 - [x] Support for Azure RBAC
-- [ ] Interactive web dashboard
+- [x] Interactive web dashboard
 - [ ] Integration with Security Command Center
 - [ ] ML-based anomaly detection
 - [ ] Automated remediation workflows
