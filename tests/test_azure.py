@@ -83,7 +83,9 @@ class TestAzureAuditor:
         return AzureAuditor(config=config)
 
     def test_detect_admin_access_star(self, auditor):
-        role = AzureRoleDefinition(roleName="AdminRole", actions=["*"], assignableScopes=["/subscriptions/123"])
+        role = AzureRoleDefinition(
+            roleName="AdminRole", actions=["*"], assignableScopes=["/subscriptions/123"]
+        )
         findings = auditor.audit_policy(role)
         assert len(findings) == 1
         assert findings[0].id == "AZURE_ADMIN_ACCESS"
@@ -132,7 +134,9 @@ class TestAzureAuditor:
     def test_builtin_role_ignore_scope(self, auditor):
         """Built-in roles often have broad scopes but we can't change them, so usually ignore scope check or mark as info."""
         # Our logic currently only checks IsCustom=True for broad scope
-        role = AzureRoleDefinition(roleName="Owner", isCustom=False, actions=["*"], assignableScopes=["/"])
+        role = AzureRoleDefinition(
+            roleName="Owner", isCustom=False, actions=["*"], assignableScopes=["/"]
+        )
         findings = auditor.audit_policy(role)
         # Should detect ADMIN ACCESS but NOT BROAD SCOPE because IsCustom=False
         ids = [f.id for f in findings]
