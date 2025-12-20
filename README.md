@@ -137,7 +137,7 @@ iam-simulator dashboard
 iam-simulator audit --policy policy.json --config config.yaml --export-to-scc --scc-org 123456789 --scc-source 987654321
 ```
 
-### 6. Run Audit
+### 6. Run Audit 
 
 ```bash
 # Audit the policy for security risks
