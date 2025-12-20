@@ -4,11 +4,11 @@ import logging
 from datetime import datetime, timezone
 
 try:
-    from google.cloud import securitycenter  # type: ignore
-    from google.protobuf import timestamp_pb2  # type: ignore
+    from google.cloud import securitycenter
+    from google.protobuf import timestamp_pb2
 except ImportError:
-    securitycenter = None
-    timestamp_pb2 = None
+    securitycenter = None  # type: ignore
+    timestamp_pb2 = None  # type: ignore
 
 from src.core.models import Finding
 
