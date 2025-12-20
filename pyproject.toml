@@ -36,6 +36,7 @@ dependencies = [
     "rich>=13.9.4,<14.0.0",
     "streamlit>=1.30.0,<2.0.0",
     "plotly>=5.0.0,<6.0.0",
+    "google-cloud-securitycenter>=2.0.0,<3.0.0",
 ]
 
 [project.optional-dependencies]
@@ -146,6 +147,7 @@ ignore = [
     "RUF015", # prefer next over slice
     "RUF005", # list concatenation
 ]
+"tests/test_scc.py" = ["E402"] # imports not at top allowed for mocking logic
 "tests/test_config.py" = [
     "B017",   # assert blind exception
     "PT011",  # pytest.raises too broad

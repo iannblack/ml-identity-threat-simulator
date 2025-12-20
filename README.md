@@ -130,7 +130,14 @@ iam-simulator audit --policy azure_role.json --provider azure
 iam-simulator dashboard
 ```
 
-### 5. Run Audit
+### 5. Run Audit and Export to SCC
+
+```bash
+# Audit and export findings to Google Security Command Center
+iam-simulator audit --policy policy.json --config config.yaml --export-to-scc --scc-org 123456789 --scc-source 987654321
+```
+
+### 6. Run Audit
 
 ```bash
 # Audit the policy for security risks
@@ -549,7 +556,7 @@ copies or substantial portions of the Software.
 - [x] Support for AWS IAM policies
 - [x] Support for Azure RBAC
 - [x] Interactive web dashboard
-- [ ] Integration with Security Command Center
+- [x] Integration with Security Command Center
 - [ ] ML-based anomaly detection
 - [ ] Automated remediation workflows
 - [ ] Terraform/Pulumi integration

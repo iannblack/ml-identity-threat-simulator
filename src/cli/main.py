@@ -36,7 +36,18 @@ def cli() -> None:
     type=click.Choice(["gcp", "aws", "azure"]),
     help="Cloud provider (gcp, aws, azure)",
 )
-def audit(policy: str, config: str, out: str, provider: str) -> None:
+@click.option("--export-to-scc", is_flag=True, help="Export findings to Google SCC")
+@click.option("--scc-org", help="Google Cloud Organization ID (required for SCC export)")
+@click.option("--scc-source", help="SCC Source ID (required for SCC export)")
+def audit(
+    policy: str,
+    config: str,
+    out: str,
+    provider: str,
+    export_to_scc: bool,
+    scc_org: str | None,
+    scc_source: str | None,
+) -> None:
     """Audit an IAM policy for risks."""
     logger.info(f"Starting {provider.upper()} audit on {policy} using config {config}")
 
@@ -68,14 +79,35 @@ def audit(policy: str, config: str, out: str, provider: str) -> None:
 
         console.print(table)
 
-        # Export
+        # Export to File
         with open(out, "w") as file_out:
             json.dump([f.model_dump() for f in findings], file_out, indent=2)
 
         logger.info(f"Findings exported to {out}")
 
+        # Export to SCC
+        if export_to_scc:
+            if not scc_org or not scc_source:
+                console.print(
+                    "[bold red]Error:[/bold red] --scc-org and --scc-source are required for SCC export."
+                )
+            else:
+                try:
+                    from src.integrations.scc import SCCExporter
+
+                    console.print("[yellow]Exporting to Security Command Center...[/yellow]")
+                    exporter = SCCExporter(scc_org, scc_source)
+                    count = exporter.export(findings)
+                    console.print(f"[green]Successfully exported {count} findings to SCC.[/green]")
+                except ImportError:
+                    console.print(
+                        "[bold red]Error:[/bold red] google-cloud-securitycenter not installed."
+                    )
+                except Exception as e:
+                    console.print(f"[bold red]SCC Export Failed:[/bold red] {e}")
+
     except Exception:
-        logger.exception("Audit failed")
+        logger.exception("An error occurred during execution")
         raise click.Abort from None
 
 
