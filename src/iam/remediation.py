@@ -2,9 +2,7 @@
 Automated remediation workflows for IAM findings.
 Generates CLI commands to fix detected security issues across GCP, AWS, and Azure.
 """
-
 from abc import ABC, abstractmethod
-import json
 
 from src.core.models import Finding
 
@@ -15,7 +13,6 @@ class Remediator(ABC):
     @abstractmethod
     def generate_remediation_command(self, finding: Finding) -> str | None:
         """Generate a single CLI command to remediate a finding."""
-        pass
 
     def generate_script(self, findings: list[Finding], header: str = "#!/bin/bash") -> str:
         """Generate a complete shell script for multiple findings."""
@@ -75,15 +72,13 @@ class AwsRemediator(Remediator):
     """Generates AWS CLI commands for remediation."""
 
     def generate_remediation_command(self, finding: Finding) -> str | None:
-        details = finding.details or {}
-
         if finding.id == "AWS_PUBLIC_ACCESS":
             # This is tricky because the policy is inside a JSON file or inline.
             # We can't easily patch it with a single CLI command without knowing the policy name/ARN context.
             # However, we can provide a generic guidance command or a placeholder.
             return "# Manual intervention required: Update the policy to remove Principal: '*'"
 
-        elif finding.id == "AWS_UNRESTRICTED_ADMIN":
+        if finding.id == "AWS_UNRESTRICTED_ADMIN":
             return "# Manual intervention required: Restrict Actions and Resources in the policy."
 
         return None
@@ -116,9 +111,10 @@ class RemediationFactory:
     def get_remediator(provider: str) -> Remediator:
         if provider.lower() == "gcp":
             return GcpRemediator()
-        elif provider.lower() == "aws":
+        if provider.lower() == "aws":
             return AwsRemediator()
-        elif provider.lower() == "azure":
+        if provider.lower() == "azure":
             return AzureRemediator()
-        else:
-            raise ValueError(f"Unknown provider: {provider}")
+
+        msg = f"Unknown provider: {provider}"
+        raise ValueError(msg)

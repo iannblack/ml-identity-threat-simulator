@@ -332,7 +332,7 @@ def remediate(findings: str, provider: str, out: str) -> None:
 
         # Make executable on Unix-like systems
         try:
-            os.chmod(out, 0o755)
+            os.chmod(out, 0o700)
         except OSError:
             pass
 

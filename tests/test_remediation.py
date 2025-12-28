@@ -1,6 +1,7 @@
 """Tests for remediation module."""
 
 import pytest
+
 from src.core.models import Finding
 from src.iam.remediation import GcpRemediator, RemediationFactory
 
