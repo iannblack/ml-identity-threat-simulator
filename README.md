@@ -1,7 +1,7 @@
 # 🛡️ ML Identity Threat Simulator
 
-[![CI](https://github.com/ImNotKilian/ml-identity-threat-simulator/workflows/CI/badge.svg)](https://github.com/ImNotKilian/ml-identity-threat-simulator/actions)
-[![codecov](https://codecov.io/gh/ImNotKilian/ml-identity-threat-simulator/branch/main/graph/badge.svg)](https://codecov.io/gh/ImNotKilian/ml-identity-threat-simulator)
+[![CI](https://github.com/iannblack/ml-identity-threat-simulator/workflows/CI/badge.svg)](https://github.com/iannblack/ml-identity-threat-simulator/actions)
+[![codecov](https://codecov.io/gh/iannblack/ml-identity-threat-simulator/branch/main/graph/badge.svg)](https://codecov.io/gh/iannblack/ml-identity-threat-simulator)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
@@ -58,7 +58,7 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/ImNotKilian/ml-identity-threat-simulator.git
+git clone https://github.com/iannblack/ml-identity-threat-simulator.git
 cd ml-identity-threat-simulator
 
 # Create and activate virtual environment
@@ -82,7 +82,7 @@ pip install ml-identity-threat-simulator
 
 ```bash
 # Pull the image
-docker pull imnotkilian/iam-simulator:latest
+docker pull iannblack/iam-simulator:latest
 
 # Run with Docker
 docker run --rm \
@@ -345,6 +345,36 @@ The ML anomaly detector uses **Isolation Forest** algorithm to identify unusual 
 - 📊 Baseline normal behavior across your organization
 - 🚨 Alert on unusual policy changes
 
+### Example 6: Automated Remediation
+
+**Step 1: Generate Remediation Script**
+
+Use findings from a previous audit or detection to generate a fix script:
+
+```bash
+# Generate script for GCP findings
+iam-simulator remediate \
+  --findings findings.json \
+  --provider gcp \
+  --out fix_iam.sh
+```
+
+**Step 2: Review and Execute**
+
+The generated script contains commands to revoke risky access or update roles.
+
+```bash
+# Review the script (example content)
+# #!/bin/bash
+# # Auto-generated remediation script
+# 
+# # Remediation for: Public access detected via 'allUsers' on role 'roles/owner' (WILDCARD_ACCESS)
+# gcloud projects remove-iam-policy-binding $PROJECT_ID --member='allUsers' --role='roles/owner'
+
+# Execute
+chmod +x fix_iam.sh
+./fix_iam.sh
+```
 
 ---
 
@@ -450,7 +480,7 @@ IAM_SIMULATOR_LOGGING_LEVEL=INFO
 
 ```bash
 # Clone and navigate to project
-git clone https://github.com/ImNotKilian/ml-identity-threat-simulator.git
+git clone https://github.com/iannblack/ml-identity-threat-simulator.git
 cd ml-identity-threat-simulator
 
 # Create virtual environment
@@ -626,7 +656,7 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 ```
 MIT License
 
-Copyright (c) 2025 ImNotKilian
+Copyright (c) 2025 iannblack
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -651,9 +681,9 @@ copies or substantial portions of the Software.
 
 ## 📞 Support
 
-- **Documentation:** [GitHub Wiki](https://github.com/ImNotKilian/ml-identity-threat-simulator/wiki)
-- **Issues:** [GitHub Issues](https://github.com/ImNotKilian/ml-identity-threat-simulator/issues)
-- **Discussions:** [GitHub Discussions](https://github.com/ImNotKilian/ml-identity-threat-simulator/discussions)
+- **Documentation:** [GitHub Wiki](https://github.com/iannblack/ml-identity-threat-simulator/wiki)
+- **Issues:** [GitHub Issues](https://github.com/iannblack/ml-identity-threat-simulator/issues)
+- **Discussions:** [GitHub Discussions](https://github.com/iannblack/ml-identity-threat-simulator/discussions)
 
 ---
 
@@ -664,18 +694,18 @@ copies or substantial portions of the Software.
 - [x] Interactive web dashboard
 - [x] Integration with Security Command Center
 - [x] ML-based anomaly detection
-- [ ] Automated remediation workflows
+- [x] Automated remediation workflows
 - [ ] Terraform/Pulumi integration
 
 ---
 
 ## 📊 Project Stats
 
-![GitHub stars](https://img.shields.io/github/stars/ImNotKilian/ml-identity-threat-simulator?style=social)
-![GitHub forks](https://img.shields.io/github/forks/ImNotKilian/ml-identity-threat-simulator?style=social)
-![GitHub issues](https://img.shields.io/github/issues/ImNotKilian/ml-identity-threat-simulator)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/ImNotKilian/ml-identity-threat-simulator)
-![GitHub last commit](https://img.shields.io/github/last-commit/ImNotKilian/ml-identity-threat-simulator)
+![GitHub stars](https://img.shields.io/github/stars/iannblack/ml-identity-threat-simulator?style=social)
+![GitHub forks](https://img.shields.io/github/forks/iannblack/ml-identity-threat-simulator?style=social)
+![GitHub issues](https://img.shields.io/github/issues/iannblack/ml-identity-threat-simulator)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/iannblack/ml-identity-threat-simulator)
+![GitHub last commit](https://img.shields.io/github/last-commit/iannblack/ml-identity-threat-simulator)
 
 ---
 

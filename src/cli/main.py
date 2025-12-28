@@ -15,6 +15,7 @@ from src.iam.aws_parsers import load_aws_policy_from_json
 from src.iam.azure_auditor import AzureAuditor
 from src.iam.azure_parsers import load_azure_role_from_json
 from src.iam.parsers import load_policy_from_json
+from src.iam.remediation import RemediationFactory
 from src.simulator.runner import ScenarioRunner
 
 console = Console()
@@ -286,6 +287,61 @@ def ml_detect(policy: str, provider: str, model_path: str, out: str) -> None:
         raise click.Abort from None
     except Exception as e:
         logger.exception("ML detection failed")
+        console.print(f"[bold red]Error:[/bold red] {e}")
+        raise click.Abort from None
+
+
+@cli.command()
+@click.option("--findings", required=True, help="Path to findings JSON file")
+@click.option(
+    "--provider",
+    type=click.Choice(["gcp", "aws", "azure"]),
+    required=True,
+    help="Cloud provider",
+)
+@click.option("--out", default="remediation_script.sh", help="Output script file")
+def remediate(findings: str, provider: str, out: str) -> None:
+    """Generate remediation script from findings."""
+    logger.info(f"Generating remediation script for {provider.upper()}")
+
+    try:
+        # Load findings
+        with open(findings) as f:
+            data = json.load(f)
+
+        finding_list = []
+        if isinstance(data, list):
+            finding_list = [Finding(**item) for item in data]
+        elif isinstance(data, dict) and "findings" in data:
+            finding_list = [Finding(**item) for item in data["findings"]]
+        else:
+            console.print("[bold red]Error:[/bold red] Invalid findings format")
+            return
+
+        if not finding_list:
+            console.print("[yellow]No findings to remediate[/yellow]")
+            return
+
+        # Get remediator
+        remediator = RemediationFactory.get_remediator(provider)
+        script_content = remediator.generate_script(finding_list)
+
+        # Write script
+        with open(out, "w") as f:
+            f.write(script_content)
+
+        # Make executable on Unix-like systems
+        try:
+            os.chmod(out, 0o755)
+        except OSError:
+            pass
+
+        console.print(f"[bold green]✓ Remediation script generated:[/bold green] {out}")
+        console.print(f"  Findings processed: {len(finding_list)}")
+        console.print("\n[bold yellow]⚠ CAUTION:[/bold yellow] Review the script before executing!")
+
+    except Exception as e:
+        logger.exception("Remediation generation failed")
         console.print(f"[bold red]Error:[/bold red] {e}")
         raise click.Abort from None
 
