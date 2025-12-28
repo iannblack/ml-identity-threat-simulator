@@ -377,7 +377,7 @@ class TestAnomalyResult:
         )
 
         # Invalid score (out of range)
-        with pytest.raises(ValueError, match=".*"):
+        with pytest.raises(ValueError, match=r".*"):
             AnomalyResult(
                 is_anomaly=True,
                 anomaly_score=2.0,  # > 1.0
@@ -398,7 +398,7 @@ class TestAnomalyResult:
         )
 
         # Invalid confidence
-        with pytest.raises(ValueError, match=".*"):
+        with pytest.raises(ValueError, match=r".*"):
             AnomalyResult(
                 is_anomaly=True,
                 anomaly_score=-0.1,
