@@ -163,9 +163,7 @@ class AnomalyDetector:
                 f"Wildcard actions detected: {int(features['wildcard_action_count'])} actions"
             )
         if features.get("risky_action_count", 0) > 0:
-            risk_factors.append(
-                f"Risky actions: {int(features['risky_action_count'])} statements"
-            )
+            risk_factors.append(f"Risky actions: {int(features['risky_action_count'])} statements")
         if features.get("allow_ratio", 0) == 1.0 and features.get("num_statements", 0) > 5:
             risk_factors.append("No explicit deny statements")
         return risk_factors
