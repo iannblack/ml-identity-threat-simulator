@@ -189,6 +189,7 @@ def ml_train(
         # Load all policies
         policy_objects: list[Policy | AwsPolicy | AzureRoleDefinition] = []
         for policy_path in policies:
+            policy_obj: Policy | AwsPolicy | AzureRoleDefinition
             if provider == "gcp":
                 policy_obj = load_policy_from_json(policy_path)
             elif provider == "aws":

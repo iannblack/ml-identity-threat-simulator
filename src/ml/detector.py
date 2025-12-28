@@ -131,6 +131,60 @@ class AnomalyDetector:
             risk_factors=risk_factors,
         )
 
+    def _get_gcp_risk_factors(self, features: dict[str, float]) -> list[str]:
+        """Extract risk factors for GCP policies."""
+        risk_factors = []
+        if features.get("wildcard_member_count", 0) > 0:
+            risk_factors.append(
+                f"Public access detected: {int(features['wildcard_member_count'])} wildcard members"
+            )
+        if features.get("risky_role_ratio", 0) > 0.3:
+            risk_factors.append(
+                f"High proportion of risky roles: {features['risky_role_ratio']:.1%}"
+            )
+        if features.get("service_account_ratio", 0) > 0.8:
+            risk_factors.append("Very high service account usage")
+        if (
+            features.get("conditional_binding_ratio", 0) < 0.1
+            and features.get("num_bindings", 0) > 5
+        ):
+            risk_factors.append("Low usage of conditional bindings for large policy")
+        return risk_factors
+
+    def _get_aws_risk_factors(self, features: dict[str, float]) -> list[str]:
+        """Extract risk factors for AWS policies."""
+        risk_factors = []
+        if features.get("wildcard_principal_count", 0) > 0:
+            risk_factors.append(
+                f"Wildcard principals detected: {int(features['wildcard_principal_count'])} statements"
+            )
+        if features.get("wildcard_action_count", 0) > 0:
+            risk_factors.append(
+                f"Wildcard actions detected: {int(features['wildcard_action_count'])} actions"
+            )
+        if features.get("risky_action_count", 0) > 0:
+            risk_factors.append(
+                f"Risky actions: {int(features['risky_action_count'])} statements"
+            )
+        if features.get("allow_ratio", 0) == 1.0 and features.get("num_statements", 0) > 5:
+            risk_factors.append("No explicit deny statements")
+        return risk_factors
+
+    def _get_azure_risk_factors(self, features: dict[str, float]) -> list[str]:
+        """Extract risk factors for Azure policies."""
+        risk_factors = []
+        if features.get("wildcard_action_count", 0) > 0:
+            risk_factors.append(
+                f"Wildcard actions detected: {int(features['wildcard_action_count'])} actions"
+            )
+        if features.get("risky_action_ratio", 0) > 0.3:
+            risk_factors.append(
+                f"High proportion of risky actions: {features['risky_action_ratio']:.1%}"
+            )
+        if features.get("has_management_group_scope", 0) == 1.0:
+            risk_factors.append("Management group scope assigned")
+        return risk_factors
+
     def _generate_explanation(
         self,
         features: dict[str, float],
@@ -139,56 +193,13 @@ class AnomalyDetector:
         policy: Policy | AwsPolicy | AzureRoleDefinition,
     ) -> tuple[str, list[str]]:
         """Generate human-readable explanation for the prediction."""
-        risk_factors = []
-
         # Analyze features to identify risk factors
         if isinstance(policy, Policy):
-            # GCP-specific risk factors
-            if features.get("wildcard_member_count", 0) > 0:
-                risk_factors.append(
-                    f"Public access detected: {int(features['wildcard_member_count'])} wildcard members"
-                )
-            if features.get("risky_role_ratio", 0) > 0.3:
-                risk_factors.append(
-                    f"High proportion of risky roles: {features['risky_role_ratio']:.1%}"
-                )
-            if features.get("service_account_ratio", 0) > 0.8:
-                risk_factors.append("Very high service account usage")
-            if (
-                features.get("conditional_binding_ratio", 0) < 0.1
-                and features.get("num_bindings", 0) > 5
-            ):
-                risk_factors.append("Low usage of conditional bindings for large policy")
-
+            risk_factors = self._get_gcp_risk_factors(features)
         elif isinstance(policy, AwsPolicy):
-            # AWS-specific risk factors
-            if features.get("wildcard_principal_count", 0) > 0:
-                risk_factors.append(
-                    f"Wildcard principals detected: {int(features['wildcard_principal_count'])} statements"
-                )
-            if features.get("wildcard_action_count", 0) > 0:
-                risk_factors.append(
-                    f"Wildcard actions detected: {int(features['wildcard_action_count'])} actions"
-                )
-            if features.get("risky_action_count", 0) > 0:
-                risk_factors.append(
-                    f"Risky actions: {int(features['risky_action_count'])} statements"
-                )
-            if features.get("allow_ratio", 0) == 1.0 and features.get("num_statements", 0) > 5:
-                risk_factors.append("No explicit deny statements")
-
-        elif isinstance(policy, AzureRoleDefinition):
-            # Azure-specific risk factors
-            if features.get("wildcard_action_count", 0) > 0:
-                risk_factors.append(
-                    f"Wildcard actions detected: {int(features['wildcard_action_count'])} actions"
-                )
-            if features.get("risky_action_ratio", 0) > 0.3:
-                risk_factors.append(
-                    f"High proportion of risky actions: {features['risky_action_ratio']:.1%}"
-                )
-            if features.get("has_management_group_scope", 0) == 1.0:
-                risk_factors.append("Management group scope assigned")
+            risk_factors = self._get_aws_risk_factors(features)
+        else:  # AzureRoleDefinition
+            risk_factors = self._get_azure_risk_factors(features)
 
         # Generate overall explanation
         if is_anomaly:
