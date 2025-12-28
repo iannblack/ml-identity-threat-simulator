@@ -159,5 +159,134 @@ def dashboard() -> None:
     sys.exit(stcli.main())
 
 
+@cli.command()
+@click.option(
+    "--policies",
+    required=True,
+    multiple=True,
+    help="Paths to policy JSON files for training (can specify multiple)",
+)
+@click.option(
+    "--provider",
+    default="gcp",
+    type=click.Choice(["gcp", "aws", "azure"]),
+    help="Cloud provider type",
+)
+@click.option("--model-path", default="models/anomaly_detector.pkl", help="Path to save model")
+@click.option(
+    "--contamination", default=0.1, type=float, help="Expected proportion of anomalies (0.0-0.5)"
+)
+def ml_train(policies: tuple[str, ...], provider: str, model_path: str, contamination: float) -> None:
+    """Train ML model for anomaly detection on IAM policies."""
+    logger.info(f"Training ML model on {len(policies)} {provider.upper()} policies")
+
+    try:
+        from src.ml.detector import AnomalyDetector
+        from src.ml.models import MLConfig
+
+        # Load all policies
+        policy_objects = []
+        for policy_path in policies:
+            if provider == "gcp":
+                policy_obj = load_policy_from_json(policy_path)
+            elif provider == "aws":
+                policy_obj = load_aws_policy_from_json(policy_path)
+            elif provider == "azure":
+                policy_obj = load_azure_role_from_json(policy_path)
+            else:
+                console.print(f"[bold red]Error:[/bold red] Unknown provider: {provider}")
+                return
+
+            policy_objects.append(policy_obj)
+
+        # Configure and train detector
+        ml_config = MLConfig(contamination=contamination, model_path=model_path)
+        detector = AnomalyDetector(config=ml_config)
+
+        with console.status("[bold yellow]Training model..."):
+            detector.train(policy_objects, save_model=True)
+
+        console.print(f"[bold green]✓ Model trained successfully[/bold green]")
+        console.print(f"  Model saved to: {model_path}")
+        console.print(f"  Training samples: {len(policy_objects)}")
+        console.print(f"  Contamination rate: {contamination}")
+
+    except Exception as e:
+        logger.exception("ML training failed")
+        console.print(f"[bold red]Error:[/bold red] {e}")
+        raise click.Abort from None
+
+
+@cli.command()
+@click.option("--policy", required=True, help="Path to IAM policy JSON file to analyze")
+@click.option(
+    "--provider",
+    default="gcp",
+    type=click.Choice(["gcp", "aws", "azure"]),
+    help="Cloud provider type",
+)
+@click.option(
+    "--model-path", default="models/anomaly_detector.pkl", help="Path to trained model"
+)
+@click.option("--out", default="anomaly_result.json", help="Output file for results")
+def ml_detect(policy: str, provider: str, model_path: str, out: str) -> None:
+    """Detect anomalies in an IAM policy using trained ML model."""
+    logger.info(f"Analyzing policy {policy} for anomalies")
+
+    try:
+        from src.ml.detector import AnomalyDetector
+
+        # Load policy
+        if provider == "gcp":
+            policy_obj = load_policy_from_json(policy)
+        elif provider == "aws":
+            policy_obj = load_aws_policy_from_json(policy)
+        elif provider == "azure":
+            policy_obj = load_azure_role_from_json(policy)
+        else:
+            console.print(f"[bold red]Error:[/bold red] Unknown provider: {provider}")
+            return
+
+        # Load detector and predict
+        detector = AnomalyDetector()
+        detector.load_model(model_path)
+
+        with console.status("[bold yellow]Analyzing policy..."):
+            result = detector.predict(policy_obj)
+
+        # Display results
+        if result.is_anomaly:
+            console.print(f"\n[bold red]⚠ ANOMALY DETECTED[/bold red]")
+            console.print(f"  Confidence: {result.confidence:.1%}")
+            console.print(f"  Anomaly Score: {result.anomaly_score:.3f}")
+        else:
+            console.print(f"\n[bold green]✓ Policy appears normal[/bold green]")
+            console.print(f"  Confidence: {result.confidence:.1%}")
+            console.print(f"  Anomaly Score: {result.anomaly_score:.3f}")
+
+        console.print(f"\n[bold]Explanation:[/bold]")
+        console.print(f"  {result.explanation}")
+
+        if result.risk_factors:
+            console.print(f"\n[bold yellow]Risk Factors:[/bold yellow]")
+            for factor in result.risk_factors:
+                console.print(f"  • {factor}")
+
+        # Export results
+        with open(out, "w") as f:
+            json.dump(result.model_dump(), f, indent=2)
+
+        console.print(f"\n[dim]Results saved to {out}[/dim]")
+
+    except FileNotFoundError as e:
+        console.print(f"[bold red]Error:[/bold red] {e}")
+        console.print("\n[yellow]Tip:[/yellow] Train a model first using: iam-simulator ml-train")
+        raise click.Abort from None
+    except Exception as e:
+        logger.exception("ML detection failed")
+        console.print(f"[bold red]Error:[/bold red] {e}")
+        raise click.Abort from None
+
+
 if __name__ == "__main__":
     cli()

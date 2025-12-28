@@ -31,6 +31,8 @@ class AwsPolicy(BaseModel):
 
 
 class AzureRoleDefinition(BaseModel):
+    model_config = {"populate_by_name": True}
+
     Name: str | None = None  # The UUID or display name
     RoleName: str | None = Field(None, alias="roleName")
     Description: str | None = Field(None, alias="description")
@@ -40,6 +42,7 @@ class AzureRoleDefinition(BaseModel):
     NotDataActions: list[str] = Field(default_factory=list, alias="notDataActions")
     AssignableScopes: list[str] = Field(default_factory=list, alias="assignableScopes")
     IsCustom: bool = Field(False, alias="isCustom")
+
 
 
 class Finding(BaseModel):

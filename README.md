@@ -14,14 +14,18 @@
 
 ## 🚀 Features
 
-- **🔍 Multi-Cloud Auditing** - Support for **GCP IAM** and **AWS IAM** policies
+- **🔍 Multi-Cloud Auditing** - Support for **GCP IAM**, **AWS IAM**, and **Azure RBAC** policies
 - **📊 Risk Scoring** - Quantify security risks with customizable severity levels
 - **🎮 Threat Simulation** - Run attack scenarios to validate security controls
 - **🛠️ Remediation Playbooks** - Generate actionable commands to fix issues
+- **🤖 ML-based Anomaly Detection** - Detect unusual IAM policies using Isolation Forest
 - **💻 Rich CLI** - Beautiful terminal output with tables and progress indicators
+- **📈 Interactive Dashboard** - Web-based UI for visualizing audit results
+- **☁️ Security Command Center Integration** - Export findings to Google Cloud SCC
 - **🔧 Extensible** - Easy to add custom rules and scenarios
 - **🧪 Well-Tested** - 100% code coverage with comprehensive test suite
 - **🔒 Security-First** - Automated security scanning
+
 
 ---
 
@@ -239,6 +243,108 @@ for finding in findings:
     if finding.remediation:
         print(f"  → Remediation: {finding.remediation}")
 ```
+
+### Example 5: ML-based Anomaly Detection
+
+**Step 1: Train the Model**
+
+Train an ML model on a set of normal policies to learn baseline behavior:
+
+```bash
+# Train on multiple normal GCP policies
+iam-simulator ml-train \
+  --policies policy1.json \
+  --policies policy2.json \
+  --policies policy3.json \
+  --provider gcp \
+  --model-path models/my_detector.pkl \
+  --contamination 0.1
+```
+
+**Step 2: Detect Anomalies**
+
+Use the trained model to detect anomalous policies:
+
+```bash
+# Analyze a new policy for anomalies
+iam-simulator ml-detect \
+  --policy suspicious_policy.json \
+  --provider gcp \
+  --model-path models/my_detector.pkl \
+  --out anomaly_result.json
+```
+
+**Example Output:**
+```
+⚠ ANOMALY DETECTED
+  Confidence: 92.3%
+  Anomaly Score: -0.456
+
+Explanation:
+  This policy is highly anomalous (score: -0.456). It deviates
+  significantly from normal patterns.
+
+Risk Factors:
+  • Public access detected: 2 wildcard members
+  • High proportion of risky roles: 66.7%
+  • Low usage of conditional bindings for large policy
+
+Results saved to anomaly_result.json
+```
+
+**Step 3: Programmatic Usage**
+
+```python
+from src.ml.detector import AnomalyDetector
+from src.ml.models import MLConfig
+from src.iam.parsers import load_policy_from_json
+
+# Configure ML detector
+ml_config = MLConfig(
+    contamination=0.1,
+    n_estimators=100,
+    model_path="models/detector.pkl"
+)
+
+# Train on normal policies
+detector = AnomalyDetector(config=ml_config)
+normal_policies = [load_policy_from_json(f"policy{i}.json") for i in range(1, 21)]
+detector.train(normal_policies, save_model=True)
+
+# Detect anomalies
+suspicious_policy = load_policy_from_json("suspicious.json")
+result = detector.predict(suspicious_policy)
+
+print(f"Anomaly: {result.is_anomaly}")
+print(f"Confidence: {result.confidence:.1%}")
+print(f"Explanation: {result.explanation}")
+
+for factor in result.risk_factors:
+    print(f"  - {factor}")
+```
+
+**How It Works:**
+
+The ML anomaly detector uses **Isolation Forest** algorithm to identify unusual IAM policies:
+
+1. **Feature Extraction**: Converts policies into numerical features (role counts, member types, wildcards, etc.)
+2. **Training**: Learns patterns from normal policies to establish baseline behavior
+3. **Detection**: Identifies policies that deviate significantly from learned patterns
+4. **Explanation**: Provides human-readable explanations and risk factors
+
+**Supported Features:**
+
+- **GCP Features**: Risky roles, wildcard members, service accounts, conditional bindings
+- **AWS Features**: Wildcard actions/principals, risky actions, statement effects
+- **Azure Features**: Custom roles, wildcard actions, scope assignments
+
+**Use Cases:**
+
+- 🎯 Detect privilege escalation attempts
+- 🔍 Identify misconfigured policies before deployment
+- 📊 Baseline normal behavior across your organization
+- 🚨 Alert on unusual policy changes
+
 
 ---
 
@@ -557,7 +663,7 @@ copies or substantial portions of the Software.
 - [x] Support for Azure RBAC
 - [x] Interactive web dashboard
 - [x] Integration with Security Command Center
-- [ ] ML-based anomaly detection
+- [x] ML-based anomaly detection
 - [ ] Automated remediation workflows
 - [ ] Terraform/Pulumi integration
 
