@@ -6,7 +6,7 @@ from .models import AnomalyResult, MLConfig
 
 __all__ = [
     "AnomalyDetector",
-    "PolicyFeatureExtractor",
     "AnomalyResult",
     "MLConfig",
+    "PolicyFeatureExtractor",
 ]

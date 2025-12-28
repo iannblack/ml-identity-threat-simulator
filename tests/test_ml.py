@@ -20,7 +20,10 @@ def normal_gcp_policies() -> list[Policy]:
         bindings = [
             Binding(
                 role="roles/viewer",
-                members=[f"user:user{i}@example.com", "serviceAccount:sa@project.iam.gserviceaccount.com"],
+                members=[
+                    f"user:user{i}@example.com",
+                    "serviceAccount:sa@project.iam.gserviceaccount.com",
+                ],
             ),
             Binding(
                 role="roles/editor",
@@ -152,7 +155,10 @@ class TestPolicyFeatureExtractor:
             Name="CustomRole",
             Actions=["*", "Microsoft.Compute/virtualMachines/read"],
             NotActions=["Microsoft.Authorization/*/Delete"],
-            AssignableScopes=["/subscriptions/12345", "/providers/Microsoft.Management/managementGroups/mg1"],
+            AssignableScopes=[
+                "/subscriptions/12345",
+                "/providers/Microsoft.Management/managementGroups/mg1",
+            ],
             IsCustom=True,
         )
 

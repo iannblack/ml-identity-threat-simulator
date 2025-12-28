@@ -44,7 +44,6 @@ class AzureRoleDefinition(BaseModel):
     IsCustom: bool = Field(False, alias="isCustom")
 
 
-
 class Finding(BaseModel):
     id: str = Field(..., description="Unique identifier for the finding type")
     severity: str = Field(..., pattern="^(LOW|MEDIUM|HIGH|CRITICAL)$")

@@ -45,7 +45,8 @@ class AnomalyDetector:
             ValueError: If policies list is empty or contains unsupported types.
         """
         if not policies:
-            raise ValueError("Cannot train on empty policy list")
+            msg = "Cannot train on empty policy list"
+            raise ValueError(msg)
 
         logger.info(f"Training anomaly detector on {len(policies)} policies")
 
@@ -56,7 +57,7 @@ class AnomalyDetector:
             vector = self.feature_extractor.features_to_vector(features)
             feature_vectors.append(vector)
 
-        X = np.array(feature_vectors)
+        x = np.array(feature_vectors)
 
         # Get feature names from first policy
         first_features = self.feature_extractor.extract_features(policies[0])
@@ -75,7 +76,7 @@ class AnomalyDetector:
             n_jobs=-1,  # Use all available cores
         )
 
-        self.model.fit(X)
+        self.model.fit(x)
         self.is_trained = True
 
         logger.info("Model training completed successfully")
@@ -98,18 +99,19 @@ class AnomalyDetector:
             RuntimeError: If model hasn't been trained yet.
         """
         if not self.is_trained or self.model is None:
-            raise RuntimeError("Model must be trained before prediction. Call train() first.")
+            msg = "Model must be trained before prediction. Call train() first."
+            raise RuntimeError(msg)
 
         # Extract features
         features = self.feature_extractor.extract_features(policy)
-        X = self.feature_extractor.features_to_vector(features).reshape(1, -1)
+        x = self.feature_extractor.features_to_vector(features).reshape(1, -1)
 
         # Predict (-1 for anomaly, 1 for normal)
-        prediction = self.model.predict(X)[0]
+        prediction = self.model.predict(x)[0]
         is_anomaly = prediction == -1
 
         # Get anomaly score (negative means more anomalous)
-        anomaly_score = float(self.model.score_samples(X)[0])
+        anomaly_score = float(self.model.score_samples(x)[0])
 
         # Convert score to confidence (0-1 range)
         # Scores typically range from -0.5 to 0.5, normalize to 0-1
@@ -152,7 +154,10 @@ class AnomalyDetector:
                 )
             if features.get("service_account_ratio", 0) > 0.8:
                 risk_factors.append("Very high service account usage")
-            if features.get("conditional_binding_ratio", 0) < 0.1 and features.get("num_bindings", 0) > 5:
+            if (
+                features.get("conditional_binding_ratio", 0) < 0.1
+                and features.get("num_bindings", 0) > 5
+            ):
                 risk_factors.append("Low usage of conditional bindings for large policy")
 
         elif isinstance(policy, AwsPolicy):
@@ -166,7 +171,9 @@ class AnomalyDetector:
                     f"Wildcard actions detected: {int(features['wildcard_action_count'])} actions"
                 )
             if features.get("risky_action_count", 0) > 0:
-                risk_factors.append(f"Risky actions: {int(features['risky_action_count'])} statements")
+                risk_factors.append(
+                    f"Risky actions: {int(features['risky_action_count'])} statements"
+                )
             if features.get("allow_ratio", 0) == 1.0 and features.get("num_statements", 0) > 5:
                 risk_factors.append("No explicit deny statements")
 
@@ -215,7 +222,8 @@ class AnomalyDetector:
             RuntimeError: If model hasn't been trained yet.
         """
         if not self.is_trained or self.model is None:
-            raise RuntimeError("Cannot save untrained model")
+            msg = "Cannot save untrained model"
+            raise RuntimeError(msg)
 
         model_path = Path(path)
         model_path.parent.mkdir(parents=True, exist_ok=True)
@@ -242,7 +250,8 @@ class AnomalyDetector:
         """
         model_path = Path(path)
         if not model_path.exists():
-            raise FileNotFoundError(f"Model file not found: {model_path}")
+            msg = f"Model file not found: {model_path}"
+            raise FileNotFoundError(msg)
 
         # Load model and related data
         model_data = joblib.load(model_path)
@@ -265,13 +274,13 @@ class AnomalyDetector:
             RuntimeError: If model hasn't been trained yet.
         """
         if not self.is_trained or self.model is None:
-            raise RuntimeError("Model must be trained first")
+            msg = "Model must be trained first"
+            raise RuntimeError(msg)
 
         # For Isolation Forest, we can't get traditional feature importance
         # Instead, return average feature values as a proxy
         logger.warning(
-            "Isolation Forest doesn't provide feature importance. "
-            "Returning placeholder values."
+            "Isolation Forest doesn't provide feature importance. Returning placeholder values."
         )
 
         return {name: 1.0 / len(self.feature_names) for name in self.feature_names}

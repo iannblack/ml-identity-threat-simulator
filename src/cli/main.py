@@ -8,7 +8,7 @@ from rich.table import Table
 
 from src.core.config import AppConfig
 from src.core.logger import setup_logger
-from src.core.models import Finding
+from src.core.models import AwsPolicy, AzureRoleDefinition, Finding, Policy
 from src.iam.auditor import IAMAuditor
 from src.iam.aws_auditor import AwsAuditor
 from src.iam.aws_parsers import load_aws_policy_from_json
@@ -176,7 +176,9 @@ def dashboard() -> None:
 @click.option(
     "--contamination", default=0.1, type=float, help="Expected proportion of anomalies (0.0-0.5)"
 )
-def ml_train(policies: tuple[str, ...], provider: str, model_path: str, contamination: float) -> None:
+def ml_train(
+    policies: tuple[str, ...], provider: str, model_path: str, contamination: float
+) -> None:
     """Train ML model for anomaly detection on IAM policies."""
     logger.info(f"Training ML model on {len(policies)} {provider.upper()} policies")
 
@@ -185,7 +187,7 @@ def ml_train(policies: tuple[str, ...], provider: str, model_path: str, contamin
         from src.ml.models import MLConfig
 
         # Load all policies
-        policy_objects = []
+        policy_objects: list[Policy | AwsPolicy | AzureRoleDefinition] = []
         for policy_path in policies:
             if provider == "gcp":
                 policy_obj = load_policy_from_json(policy_path)
@@ -206,7 +208,7 @@ def ml_train(policies: tuple[str, ...], provider: str, model_path: str, contamin
         with console.status("[bold yellow]Training model..."):
             detector.train(policy_objects, save_model=True)
 
-        console.print(f"[bold green]✓ Model trained successfully[/bold green]")
+        console.print("[bold green]✓ Model trained successfully[/bold green]")
         console.print(f"  Model saved to: {model_path}")
         console.print(f"  Training samples: {len(policy_objects)}")
         console.print(f"  Contamination rate: {contamination}")
@@ -225,9 +227,7 @@ def ml_train(policies: tuple[str, ...], provider: str, model_path: str, contamin
     type=click.Choice(["gcp", "aws", "azure"]),
     help="Cloud provider type",
 )
-@click.option(
-    "--model-path", default="models/anomaly_detector.pkl", help="Path to trained model"
-)
+@click.option("--model-path", default="models/anomaly_detector.pkl", help="Path to trained model")
 @click.option("--out", default="anomaly_result.json", help="Output file for results")
 def ml_detect(policy: str, provider: str, model_path: str, out: str) -> None:
     """Detect anomalies in an IAM policy using trained ML model."""
@@ -237,6 +237,7 @@ def ml_detect(policy: str, provider: str, model_path: str, out: str) -> None:
         from src.ml.detector import AnomalyDetector
 
         # Load policy
+        policy_obj: Policy | AwsPolicy | AzureRoleDefinition
         if provider == "gcp":
             policy_obj = load_policy_from_json(policy)
         elif provider == "aws":
@@ -256,19 +257,19 @@ def ml_detect(policy: str, provider: str, model_path: str, out: str) -> None:
 
         # Display results
         if result.is_anomaly:
-            console.print(f"\n[bold red]⚠ ANOMALY DETECTED[/bold red]")
+            console.print("\n[bold red]⚠ ANOMALY DETECTED[/bold red]")
             console.print(f"  Confidence: {result.confidence:.1%}")
             console.print(f"  Anomaly Score: {result.anomaly_score:.3f}")
         else:
-            console.print(f"\n[bold green]✓ Policy appears normal[/bold green]")
+            console.print("\n[bold green]✓ Policy appears normal[/bold green]")
             console.print(f"  Confidence: {result.confidence:.1%}")
             console.print(f"  Anomaly Score: {result.anomaly_score:.3f}")
 
-        console.print(f"\n[bold]Explanation:[/bold]")
+        console.print("\n[bold]Explanation:[/bold]")
         console.print(f"  {result.explanation}")
 
         if result.risk_factors:
-            console.print(f"\n[bold yellow]Risk Factors:[/bold yellow]")
+            console.print("\n[bold yellow]Risk Factors:[/bold yellow]")
             for factor in result.risk_factors:
                 console.print(f"  • {factor}")
 

@@ -21,9 +21,7 @@ class MLConfig(BaseModel):
         default="auto", description="Number of samples to draw from X to train each estimator"
     )
     random_state: int = Field(default=42, description="Random state for reproducibility")
-    model_path: str | None = Field(
-        default=None, description="Path to save/load trained model"
-    )
+    model_path: str | None = Field(default=None, description="Path to save/load trained model")
 
 
 class AnomalyResult(BaseModel):
@@ -33,9 +31,7 @@ class AnomalyResult(BaseModel):
     anomaly_score: float = Field(
         ..., ge=-1.0, le=1.0, description="Anomaly score (negative means anomaly)"
     )
-    confidence: float = Field(
-        ..., ge=0.0, le=1.0, description="Confidence of the prediction (0-1)"
-    )
+    confidence: float = Field(..., ge=0.0, le=1.0, description="Confidence of the prediction (0-1)")
     features: dict[str, Any] = Field(
         default_factory=dict, description="Extracted features used for detection"
     )

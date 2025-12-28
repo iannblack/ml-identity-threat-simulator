@@ -1,8 +1,5 @@
 """Feature extraction from IAM policies for ML models."""
 
-import re
-from typing import Any
-
 import numpy as np
 
 from src.core.models import AwsPolicy, AzureRoleDefinition, Policy
@@ -100,9 +97,7 @@ class PolicyFeatureExtractor:
         deny_count = sum(1 for s in policy.Statement if s.Effect == "Deny")
         features["allow_statement_count"] = float(allow_count)
         features["deny_statement_count"] = float(deny_count)
-        features["allow_ratio"] = (
-            allow_count / len(policy.Statement) if policy.Statement else 0.0
-        )
+        features["allow_ratio"] = allow_count / len(policy.Statement) if policy.Statement else 0.0
 
         # Risky actions
         risky_count = 0
@@ -178,7 +173,9 @@ class PolicyFeatureExtractor:
             1.0 if any("/subscriptions/" in s for s in role.AssignableScopes) else 0.0
         )
         features["has_management_group_scope"] = (
-            1.0 if any("/providers/Microsoft.Management/" in s for s in role.AssignableScopes) else 0.0
+            1.0
+            if any("/providers/Microsoft.Management/" in s for s in role.AssignableScopes)
+            else 0.0
         )
 
         return features
@@ -189,12 +186,13 @@ class PolicyFeatureExtractor:
         """Extract features from any supported policy type."""
         if isinstance(policy, Policy):
             return self.extract_gcp_features(policy)
-        elif isinstance(policy, AwsPolicy):
+        if isinstance(policy, AwsPolicy):
             return self.extract_aws_features(policy)
-        elif isinstance(policy, AzureRoleDefinition):
+        if isinstance(policy, AzureRoleDefinition):
             return self.extract_azure_features(policy)
-        else:
-            raise ValueError(f"Unsupported policy type: {type(policy)}")
+
+        msg = f"Unsupported policy type: {type(policy)}"
+        raise ValueError(msg)
 
     def features_to_vector(self, features: dict[str, float]) -> np.ndarray:
         """Convert feature dictionary to numpy array for ML models."""
@@ -216,7 +214,9 @@ class PolicyFeatureExtractor:
             dummy_policy_aws = AwsPolicy(Statement=[AwsStatement(Effect="Allow", Action=[])])
             dummy_features = self.extract_aws_features(dummy_policy_aws)
         elif policy_type == "azure":
-            dummy_role = AzureRoleDefinition()
+            dummy_role = AzureRoleDefinition(
+                Name="dummy", roleName="dummy", description="dummy", isCustom=False
+            )
             dummy_features = self.extract_azure_features(dummy_role)
 
         return sorted(dummy_features.keys())
