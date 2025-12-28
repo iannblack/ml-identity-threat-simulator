@@ -681,7 +681,7 @@ copies or substantial portions of the Software.
 
 <div align="center">
 
-**Made with ❤️ for Cloud Security**
+**Made with ❤️ by Ian Black for Cloud Security**
 
 [⬆ Back to Top](#️-ml-identity-threat-simulator)
 
