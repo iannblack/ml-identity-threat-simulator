@@ -18,6 +18,7 @@
 - **📊 Risk Scoring** - Quantify security risks with customizable severity levels
 - **🎮 Threat Simulation** - Run attack scenarios to validate security controls
 - **🛠️ Remediation Playbooks** - Generate actionable commands to fix issues
+- **🏗️ IaC Scanning** - Audit Terraform plans before deployment
 - **🤖 ML-based Anomaly Detection** - Detect unusual IAM policies using Isolation Forest
 - **💻 Rich CLI** - Beautiful terminal output with tables and progress indicators
 - **📈 Interactive Dashboard** - Web-based UI for visualizing audit results
@@ -376,6 +377,19 @@ chmod +x fix_iam.sh
 ./fix_iam.sh
 ```
 
+### Example 7: Infrastructure as Code Scanning
+
+Scan a Terraform plan JSON for security risks before applying it:
+
+```bash
+# 1. Generate plan JSON
+terraform plan -out=tfplan
+terraform show -json tfplan > plan.json
+
+# 2. Scan with IAM Simulator
+iam-simulator iac-scan --plan plan.json
+```
+
 ---
 
 ## 🏗️ Architecture
@@ -695,7 +709,7 @@ copies or substantial portions of the Software.
 - [x] Integration with Security Command Center
 - [x] ML-based anomaly detection
 - [x] Automated remediation workflows
-- [ ] Terraform/Pulumi integration
+- [x] Terraform/Pulumi integration
 
 ---
 

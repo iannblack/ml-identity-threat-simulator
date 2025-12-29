@@ -10,6 +10,8 @@ from rich.table import Table
 from src.core.config import AppConfig
 from src.core.logger import setup_logger
 from src.core.models import AwsPolicy, AzureRoleDefinition, Finding, Policy
+from src.iac.scanner import IacScanner
+from src.iac.terraform import TerraformParser
 from src.iam.auditor import IAMAuditor
 from src.iam.aws_auditor import AwsAuditor
 from src.iam.aws_parsers import load_aws_policy_from_json
@@ -342,6 +344,57 @@ def remediate(findings: str, provider: str, out: str) -> None:
 
     except Exception as e:
         logger.exception("Remediation generation failed")
+        console.print(f"[bold red]Error:[/bold red] {e}")
+        raise click.Abort from None
+
+
+@cli.command()
+@click.option("--plan", required=True, help="Path to Terraform JSON plan file")
+@click.option("--config", default="config.yaml", help="Path to configuration file")
+@click.option("--out", default="iac_findings.json", help="Output file for findings")
+def iac_scan(plan: str, config: str, out: str) -> None:
+    """Scan a Terraform plan for IAM risks."""
+    logger.info(f"Scanning Terraform plan: {plan}")
+
+    try:
+        # Load Config
+        app_config = AppConfig.load(config)
+
+        # Parse Plan
+        parser = TerraformParser()
+        with console.status("[bold yellow]Parsing Terraform plan..."):
+            resources = parser.parse_plan(plan)
+
+        total_resources = sum(len(res) for res in resources.values())
+        console.print(f"[dim]Found {total_resources} IAM resources in plan[/dim]")
+
+        # Scan
+        scanner = IacScanner(app_config)
+        findings = scanner.scan(resources)
+
+        # Display results
+        if findings:
+            table = Table(title=f"IaC Security Findings ({len(findings)})")
+            table.add_column("Severity", style="magenta")
+            table.add_column("ID", style="cyan")
+            table.add_column("Description", style="white")
+            table.add_column("Resource", style="blue")
+
+            for f in findings:
+                table.add_row(f.severity, f.id, f.description, f.resource)
+
+            console.print(table)
+        else:
+            console.print("[bold green]✓ No security issues found in plan[/bold green]")
+
+        # Export
+        with open(out, "w") as f_out:
+            json.dump([find.model_dump() for find in findings], f_out, indent=2)
+
+        console.print(f"\n[dim]Results saved to {out}[/dim]")
+
+    except Exception as e:
+        logger.exception("IaC scan failed")
         console.print(f"[bold red]Error:[/bold red] {e}")
         raise click.Abort from None
 
