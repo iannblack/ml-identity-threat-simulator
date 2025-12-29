@@ -1,3 +1,4 @@
+import contextlib
 import json
 import os
 import sys
@@ -331,10 +332,9 @@ def remediate(findings: str, provider: str, out: str) -> None:
             f.write(script_content)
 
         # Make executable on Unix-like systems
-        try:
+
+        with contextlib.suppress(OSError):
             os.chmod(out, 0o700)
-        except OSError:
-            pass
 
         console.print(f"[bold green]✓ Remediation script generated:[/bold green] {out}")
         console.print(f"  Findings processed: {len(finding_list)}")
