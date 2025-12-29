@@ -1,6 +1,7 @@
 """
 Gemini integration for AI-powered security advice.
 """
+
 import logging
 import os
 
@@ -60,7 +61,7 @@ class GeminiAdvisor:
 
         try:
             response = self.model.generate_content(prompt)
-            return response.text
+            return str(response.text)
         except Exception as e:
             logger.error(f"Gemini API error: {e}")
             return f"Error generating explanation: {e}"

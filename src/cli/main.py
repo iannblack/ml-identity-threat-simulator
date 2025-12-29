@@ -438,17 +438,24 @@ def explain(findings: str, finding_id: str | None, api_key: str | None) -> None:
                 return
         else:
             # Default to first HIGH/CRITICAL
-            target_finding = next((f for f in finding_list if f.severity in ["CRITICAL", "HIGH"]), finding_list[0])
-            console.print(f"[dim]No ID specified. Explaining most severe finding: {target_finding.id}[/dim]")
+            target_finding = next(
+                (f for f in finding_list if f.severity in ["CRITICAL", "HIGH"]), finding_list[0]
+            )
+            console.print(
+                f"[dim]No ID specified. Explaining most severe finding: {target_finding.id}[/dim]"
+            )
 
         # Generate Explanation
         advisor = GeminiAdvisor(api_key=api_key)
 
-        with console.status(f"[bold purple]Asking Gemini about {target_finding.id}...[/bold purple]"):
+        with console.status(
+            f"[bold purple]Asking Gemini about {target_finding.id}...[/bold purple]"
+        ):
             explanation = advisor.explain_finding(target_finding)
 
         console.print(f"\n[bold]{target_finding.id} - AI Analysis[/bold]")
         from rich.markdown import Markdown
+
         console.print(Markdown(explanation))
 
     except Exception as e:
