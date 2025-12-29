@@ -18,6 +18,7 @@ class IAMAuditor:
                         description=f"Role '{binding.role}' is considered too permissive.",
                         details={"role": binding.role, "members": binding.members},
                         remediation="Consider downgrading to a less privileged role.",
+                        compliance=["CIS GCP 1.4", "NIST AC-6"],
                     )
                 )
 
@@ -33,6 +34,7 @@ class IAMAuditor:
                             description=f"Public access detected via '{member}' on role '{binding.role}'.",
                             details={"role": binding.role, "member": member},
                             remediation="Remove public access immediately.",
+                            compliance=["CIS GCP 1.2", "NIST AC-3"],
                         )
                     )
 
@@ -48,6 +50,7 @@ class IAMAuditor:
                             description=f"Service Account '{member}' has broad privileges '{binding.role}'.",
                             details={"role": binding.role, "member": member},
                             remediation="Apply Least Privilege principle.",
+                            compliance=["CIS GCP 1.5", "NIST AC-6"],
                         )
                     )
 

@@ -19,6 +19,8 @@
 - **🎮 Threat Simulation** - Run attack scenarios to validate security controls
 - **🛠️ Remediation Playbooks** - Generate actionable commands to fix issues
 - **🏗️ IaC Scanning** - Audit Terraform plans before deployment
+- **📋 Compliance Mapping** - Map findings to CIS/NIST controls
+- **🧠 GenAI Assistant** - Explain risks and fixes using Google Gemini
 - **🤖 ML-based Anomaly Detection** - Detect unusual IAM policies using Isolation Forest
 - **💻 Rich CLI** - Beautiful terminal output with tables and progress indicators
 - **📈 Interactive Dashboard** - Web-based UI for visualizing audit results
@@ -390,6 +392,15 @@ terraform show -json tfplan > plan.json
 iam-simulator iac-scan --plan plan.json
 ```
 
+### Example 8: AI-Powered Explanation
+
+Get a detailed explanation and remediation advice for a finding using Google Gemini:
+
+```bash
+export GOOGLE_API_KEY="your-api-key"
+iam-simulator explain --findings findings.json --id RISKY_ROLE
+```
+
 ---
 
 ## 🏗️ Architecture
@@ -710,6 +721,8 @@ copies or substantial portions of the Software.
 - [x] ML-based anomaly detection
 - [x] Automated remediation workflows
 - [x] Terraform/Pulumi integration
+- [x] Compliance Mapping (CIS, NIST)
+- [x] GenAI Integration (Gemini)
 
 ---
 

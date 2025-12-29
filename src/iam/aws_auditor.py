@@ -49,6 +49,7 @@ class AwsAuditor:
                     resource="aws_policy",
                     details={"statement": stmt.model_dump()},
                     remediation="Restrict actions and resources to least privilege.",
+                    compliance=["CIS AWS 1.16", "NIST AC-6"],
                 )
             )
 
@@ -71,6 +72,7 @@ class AwsAuditor:
                     resource="aws_policy",
                     details={"statement": stmt.model_dump()},
                     remediation="Specify explicit AWS accounts or users in Principal.",
+                    compliance=["CIS AWS 1.2", "NIST AC-3"],
                 )
             )
 

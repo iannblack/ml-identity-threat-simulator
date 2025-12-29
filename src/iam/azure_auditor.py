@@ -37,6 +37,7 @@ class AzureAuditor:
                     resource="azure_role",
                     details={"role": role.RoleName, "actions": role.Actions},
                     remediation="Restrict actions to only necessary operations.",
+                    compliance=["CIS Azure 1.23", "NIST AC-6"],
                 )
             )
 
@@ -60,6 +61,7 @@ class AzureAuditor:
                         resource="azure_role",
                         details={"role": role.RoleName, "scope": scope},
                         remediation="Limit AssignableScopes to specific Resource Groups where possible.",
+                        compliance=["CIS Azure 1.2", "NIST AC-3"],
                     )
                 )
 

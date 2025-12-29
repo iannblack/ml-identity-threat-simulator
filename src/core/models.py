@@ -51,6 +51,7 @@ class Finding(BaseModel):
     resource: str = "project-policy"
     details: Any = None
     remediation: str | None = None
+    compliance: list[str] = Field(default_factory=list, description="Violated compliance controls")
 
 
 class ScenarioCheck(BaseModel):

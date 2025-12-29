@@ -76,10 +76,11 @@ def audit(
         table = Table(title=f"Audit Findings ({len(findings)})")
         table.add_column("Severity", style="magenta")
         table.add_column("ID", style="cyan")
+        table.add_column("Compliance", style="green")
         table.add_column("Description", style="white")
 
         for f in findings:
-            table.add_row(f.severity, f.id, f.description)
+            table.add_row(f.severity, f.id, ", ".join(f.compliance), f.description)
 
         console.print(table)
 
@@ -377,11 +378,12 @@ def iac_scan(plan: str, config: str, out: str) -> None:
             table = Table(title=f"IaC Security Findings ({len(findings)})")
             table.add_column("Severity", style="magenta")
             table.add_column("ID", style="cyan")
+            table.add_column("Compliance", style="green")
             table.add_column("Description", style="white")
             table.add_column("Resource", style="blue")
 
             for f in findings:
-                table.add_row(f.severity, f.id, f.description, f.resource)
+                table.add_row(f.severity, f.id, ", ".join(f.compliance), f.description, f.resource)
 
             console.print(table)
         else:
@@ -395,6 +397,62 @@ def iac_scan(plan: str, config: str, out: str) -> None:
 
     except Exception as e:
         logger.exception("IaC scan failed")
+        console.print(f"[bold red]Error:[/bold red] {e}")
+        raise click.Abort from None
+
+
+@cli.command()
+@click.option("--findings", required=True, help="Path to findings JSON file")
+@click.option("--id", "finding_id", help="Specific Finding ID to explain (optional)")
+@click.option("--api-key", help="Google API Key (optional, can use GOOGLE_API_KEY env var)")
+def explain(findings: str, finding_id: str | None, api_key: str | None) -> None:
+    """Use AI to explain findings and get remediation advice."""
+    try:
+        # Check Imports
+        try:
+            from src.integrations.gemini import GeminiAdvisor
+        except ImportError as e:
+            console.print(f"[bold red]Error:[/bold red] {e}")
+            return
+
+        # Load findings
+        with open(findings) as f:
+            data = json.load(f)
+
+        finding_list = []
+        if isinstance(data, list):
+            finding_list = [Finding(**item) for item in data]
+        elif isinstance(data, dict) and "findings" in data:
+            finding_list = [Finding(**item) for item in data["findings"]]
+
+        if not finding_list:
+            console.print("[yellow]No findings found to explain.[/yellow]")
+            return
+
+        # Select finding
+        target_finding = None
+        if finding_id:
+            target_finding = next((f for f in finding_list if f.id == finding_id), None)
+            if not target_finding:
+                console.print(f"[bold red]Error:[/bold red] Finding ID '{finding_id}' not found.")
+                return
+        else:
+            # Default to first HIGH/CRITICAL
+            target_finding = next((f for f in finding_list if f.severity in ["CRITICAL", "HIGH"]), finding_list[0])
+            console.print(f"[dim]No ID specified. Explaining most severe finding: {target_finding.id}[/dim]")
+
+        # Generate Explanation
+        advisor = GeminiAdvisor(api_key=api_key)
+
+        with console.status(f"[bold purple]Asking Gemini about {target_finding.id}...[/bold purple]"):
+            explanation = advisor.explain_finding(target_finding)
+
+        console.print(f"\n[bold]{target_finding.id} - AI Analysis[/bold]")
+        from rich.markdown import Markdown
+        console.print(Markdown(explanation))
+
+    except Exception as e:
+        logger.exception("AI explanation failed")
         console.print(f"[bold red]Error:[/bold red] {e}")
         raise click.Abort from None
 
